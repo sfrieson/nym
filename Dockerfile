@@ -6,6 +6,7 @@ COPY package*.json ./
 
 RUN npm ci --only=production && npm cache clean --force
 
+COPY ./public ./public
 COPY ./src ./src
 
 EXPOSE 8080
