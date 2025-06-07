@@ -30,7 +30,10 @@ function parseResponse(text) {
     return responseSchema.parse(json);
   } catch (error) {
     console.error(error);
-    throw new Error(`Failed to parse response: ${error.message}`);
+    if (error instanceof Error) {
+      throw new Error(`Failed to parse response: ${error.message}`);
+    }
+    throw error;
   }
 }
 

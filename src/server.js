@@ -100,6 +100,9 @@ exports.createServer = async (controller) => {
         cb?.(null, port);
       });
     },
+    close: (cb) => {
+      server.close(cb);
+    },
   };
 };
 
