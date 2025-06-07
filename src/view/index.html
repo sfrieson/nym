@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nym</title>
+    <style>
+      body {
+        background-color: #eee;
+        color: #333;
+        font-family: sans-serif;
+        min-width: 100vw;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .page {
+        border-radius: 24px;
+        backdrop-filter: blur(10px);
+        border: 1px solid transparent;
+        padding: 24px;
+        background-color: #fffd;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-sizing: border-box;
+      }
+
+      .page.thinking {
+        animation: thinking 1s linear infinite;
+      }
+
+      form {
+        display: flex;
+        padding: 4px 4px 4px 12px;
+        border-radius: 24px;
+        border: 3px solid #eee;
+        height: 48px;
+        box-sizing: border-box;
+        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      }
+      form:focus-within {
+        border-color: #0ffd;
+        box-shadow: 0 0 10px #0ffd;
+      }
+      input {
+        border: 0;
+        font-size: 1.5em;
+        background: none;
+      }
+      input:focus {
+        outline: none;
+      }
+      button {
+        border: 0;
+        background-color: #0ff6;
+        color: #333;
+        padding: 4px 12px;
+        border-radius: 17px;
+        font-size: 1.5em;
+        height: 34px;
+        box-sizing: border-box;
+      }
+
+      @keyframes thinking {
+        0% {
+          border-color: #fffd;
+          box-shadow: 0 0 10px #0ffd;
+        }
+        50% {
+          border-color: #0ffd;
+          box-shadow: 0 0 2px #0ffd;
+        }
+        100% {
+          border-color: #fffd;
+          box-shadow: 0 0 10px #0ffd;
+        }
+      }
+
+      .responses {
+        width: 450px;
+      }
+
+      .meaning-title {
+        margin-bottom: 0;
+      }
+      .meaning-explanation {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <h1><img src="/logo.svg" alt="nym" width="150px" /></h1>
+
+      <form name="acronym">
+        <input
+          type="text"
+          name="q"
+          placeholder="Enter an acronym"
+          autofocus
+          autocomplete="off"
+        />
+        <button type="submit">Submit</button>
+      </form>
+
+      <div id="meanings"></div>
+    </div>
+    <template id="meaning-template">
+      <div class="meaning">
+        <h2 class="meaning-title"></h2>
+        <p class="meaning-explanation"></p>
+      </div>
+    </template>
+    <script>
+      const form = document.querySelector("form");
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const acronym = formData.get("q");
+        if (!acronym) return;
+        document.activeElement?.blur();
+        const page = document.querySelector(".page");
+        page.classList.add("thinking");
+
+        const meaningsContainer = document.getElementById("meanings");
+        meaningsContainer.innerHTML = "";
+
+        fetch(`/acronym?q=${acronym}`)
+          .then((res) => res.json())
+          .then((data) => {
+            const meanings = data.meanings;
+            meaningsContainer.innerHTML = "";
+            meanings.forEach((meaning) => {
+              const meaningTemplate =
+                document.getElementById("meaning-template");
+              const meaningElement = meaningTemplate.content.cloneNode(true);
+              meaningElement.querySelector(".meaning-title").textContent =
+                meaning.meaning;
+              meaningElement.querySelector(".meaning-explanation").textContent =
+                meaning.explanation;
+              meaningsContainer.appendChild(meaningElement);
+            });
+          })
+          .finally(() => {
+            page.classList.remove("thinking");
+          });
+      });
+    </script>
+  </body>
+</html>
