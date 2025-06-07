@@ -43,6 +43,8 @@
         height: 48px;
         box-sizing: border-box;
         transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        width: 375px;
+        gap: 4px;
       }
       form:focus-within {
         border-color: #0ffd;
@@ -52,6 +54,7 @@
         border: 0;
         font-size: 1.5em;
         background: none;
+        min-width: 0;
       }
       input:focus {
         outline: none;
@@ -102,11 +105,11 @@
         <input
           type="text"
           name="q"
-          placeholder="Enter an acronym"
+          placeholder="Enter an acronym..."
           autofocus
           autocomplete="off"
         />
-        <button type="submit">Submit</button>
+        <button type="submit">Create</button>
       </form>
 
       <div id="meanings"></div>
@@ -128,6 +131,9 @@
         const page = document.querySelector(".page");
         page.classList.add("thinking");
 
+        const button = form.querySelector("button");
+        button.disabled = true;
+        button.textContent = "Creating...";
         const meaningsContainer = document.getElementById("meanings");
         meaningsContainer.innerHTML = "";
 
@@ -149,6 +155,8 @@
           })
           .finally(() => {
             page.classList.remove("thinking");
+            button.disabled = false;
+            button.textContent = "Create";
           });
       });
     </script>
