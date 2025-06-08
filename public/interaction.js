@@ -5,8 +5,8 @@ form.addEventListener("submit", async (e) => {
   const acronym = formData.get("q");
   if (!acronym) return;
   document.activeElement?.blur();
-  const page = document.querySelector(".page");
-  page.classList.add("thinking");
+  const card = document.querySelector(".card");
+  card.classList.add("thinking");
 
   const button = form.querySelector("button");
   button.disabled = true;
@@ -15,6 +15,7 @@ form.addEventListener("submit", async (e) => {
   meaningsContainer.innerHTML = "";
 
   try {
+    document.dispatchEvent(RequestStartEvent);
     meaningsContainer.innerHTML = "";
     meaningsContainer.classList.remove("visible");
     meaningsContainer.style.height = "0px";
@@ -41,9 +42,10 @@ form.addEventListener("submit", async (e) => {
   } catch (error) {
     console.error(error);
   } finally {
-    page.classList.remove("thinking");
+    card.classList.remove("thinking");
     button.disabled = false;
     button.textContent = "Create";
+    document.dispatchEvent(RequestEndEvent);
   }
 });
 
@@ -65,7 +67,7 @@ function waitForAnimation(el, modify) {
   });
 }
 
-const debug = false;
+const debug = true;
 function queryAcronym(acronym) {
   if (debug) {
     return new Promise((resolve, reject) => {
@@ -74,6 +76,9 @@ function queryAcronym(acronym) {
   }
   return fetch(`/acronym?q=${acronym}`).then((res) => res.json());
 }
+
+const RequestStartEvent = new CustomEvent("request-start");
+const RequestEndEvent = new CustomEvent("request-end");
 
 const mockData = {
   acronym: "REM",

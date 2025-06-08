@@ -1,4 +1,9 @@
-.page.thinking {
+canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+.card.thinking {
   animation: thinking 1s linear infinite;
 }
 
@@ -14,6 +19,7 @@ form:focus-within {
   overflow: hidden;
   opacity: 0;
   width: 100%;
+  overflow: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {

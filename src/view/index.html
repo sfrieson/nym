@@ -4,20 +4,36 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>nym</title>
+    <meta name="description" content="not your meaning" />
     <style>
       body {
-        background-color: #eee;
         color: #333;
         font-family: sans-serif;
         min-width: 100vw;
         min-height: 100vh;
+        /* display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center; */
+        padding: 0;
+        margin: 0;
+      }
+
+      .page {
+        background-color: #eeec;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        backdrop-filter: blur(5px);
+        width: 100%;
+        min-height: 100vh;
+        height: 100vh;
+        padding: 20px 0;
+        box-sizing: border-box;
       }
 
-      .page {
+      .card {
         border-radius: 24px;
         backdrop-filter: blur(10px);
         border: 1px solid transparent;
@@ -31,6 +47,7 @@
         box-sizing: border-box;
         width: 500px;
         max-width: 90%;
+        max-height: 100%;
       }
 
       form {
@@ -44,6 +61,7 @@
         width: 375px;
         max-width: 100%;
         gap: 4px;
+        margin-bottom: 12px;
       }
 
       input {
@@ -85,22 +103,24 @@
   </head>
   <body>
     <div class="page">
-      <h1><img src="/logo.svg" alt="nym" width="150px" /></h1>
+      <div class="card">
+        <h1><img src="/logo.svg" alt="nym" width="150px" /></h1>
 
-      <form name="acronym">
-        <label for="q" class="visually-hidden">Acronym</label>
-        <input
-          id="q"
-          type="text"
-          name="q"
-          placeholder="Enter an acronym..."
-          autofocus
-          autocomplete="off"
-        />
-        <button type="submit">Create</button>
-      </form>
+        <form name="acronym">
+          <label for="q" class="visually-hidden">Acronym</label>
+          <input
+            id="q"
+            type="text"
+            name="q"
+            placeholder="Enter an acronym..."
+            autofocus
+            autocomplete="off"
+          />
+          <button type="submit">Create</button>
+        </form>
 
-      <div id="meanings" class="responses"></div>
+        <div id="meanings" class="responses"></div>
+      </div>
     </div>
     <template id="meaning-template">
       <div class="meaning">
@@ -108,7 +128,8 @@
         <p class="meaning-explanation"></p>
       </div>
     </template>
-    <link rel="stylesheet" href="/styles.css" defer />
-    <script src="/interaction.js"></script>
+    <link rel="stylesheet" href="/styles.css" async defer />
+    <script src="/interaction.js" async defer></script>
+    <script src="/background.js" async defer></script>
   </body>
 </html>
