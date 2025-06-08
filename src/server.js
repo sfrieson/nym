@@ -54,7 +54,10 @@ exports.createServer = async (controller) => {
                 webp: "image/webp",
               }[req.url?.split(".").at(-1) ?? ""];
 
-              res.writeHead(200, { "Content-Type": contentType });
+              res.writeHead(200, {
+                "Content-Type": contentType,
+                "Cache-Control": "public, max-age=300",
+              });
               res.end(data);
             }
           );
