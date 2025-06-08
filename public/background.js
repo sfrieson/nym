@@ -31,7 +31,6 @@ function draw() {
     state.t = Math.max(state.t - 0.01, 0);
   }
 
-  // state.t = state.concentration ? 1 : 0;
   state.circles.forEach((circle) => {
     circle.update(state);
     circle.draw(size);
