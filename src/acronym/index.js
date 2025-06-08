@@ -50,12 +50,20 @@ exports.createAcronymController = async function () {
      * @returns {Promise<{} | any[]>}
      */
     async generateMeaning(acronym) {
-      const response = await client.responses.create({
+      const thoughtfulResponse = await client.responses.create({
         model: "gpt-4.1-2025-04-14",
         instructions: basePrompt,
-        input: `Please,create meanings for the following letters: ${acronym}`,
+        input: `Please come up with a few possible meanings for the following letters: ${acronym}`,
+      });
+
+      const response = await client.responses.create({
+        model: "gpt-4.0-mini",
+        instructions:
+          "You are a data input specialist. You are reading the notes from a meeting about a possible meanings for an acronym. You are to accurately extract and format the list meanings from the notes.",
+        input: thoughtfulResponse.output_text,
         text: { format },
       });
+
       return parseResponse(response.output_text);
     },
   };
