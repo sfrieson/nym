@@ -40,7 +40,7 @@ function parseResponse(text) {
 exports.createAcronymController = async function () {
   const client = new openai.OpenAI();
   const basePrompt = await fs.readFile(
-    path.join(__dirname, "base-prompt.txt"),
+    path.join(__dirname, "base-prompt-2.txt"),
     "utf-8"
   );
 
@@ -54,17 +54,23 @@ exports.createAcronymController = async function () {
         model: "gpt-4.1-2025-04-14",
         instructions: basePrompt,
         input: `Please come up with a few possible meanings for the following letters: ${acronym}`,
+        temperature: 1.2,
+        top_p: 0.5,
+        store: false,
       });
 
       const response = await client.responses.create({
-        model: "gpt-4.0-mini",
+        model: "gpt-4.1-nano-2025-04-14",
         instructions:
           "You are a data input specialist. You are reading the notes from a meeting about a possible meanings for an acronym. You are to accurately extract and format the list meanings from the notes.",
         input: thoughtfulResponse.output_text,
         text: { format },
       });
 
-      return parseResponse(response.output_text);
+      return {
+        acronym,
+        meanings: parseResponse(response.output_text).meanings,
+      };
     },
   };
 };
