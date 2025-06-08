@@ -1,0 +1,49 @@
+.page.thinking {
+  animation: thinking 1s linear infinite;
+}
+
+form:focus-within {
+  border-color: #0ffd;
+  box-shadow: 0 0 10px #0ffd;
+}
+
+.responses {
+  width: 0px;
+  height: 0;
+  transition: height 800ms ease-in-out, opacity 500ms ease-in-out 200ms;
+  overflow: hidden;
+  opacity: 0;
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .responses {
+    transition: none;
+  }
+}
+
+.responses.visible {
+  opacity: 1
+}
+
+.meaning-title {
+  margin-bottom: 0;
+}
+.meaning-explanation {
+  margin: 0;
+}
+
+@keyframes thinking {
+  0% {
+    border-color: #fffd;
+    box-shadow: 0 0 10px #0ffd;
+  }
+  50% {
+    border-color: #0ffd;
+    box-shadow: 0 0 2px #0ffd;
+  }
+  100% {
+    border-color: #fffd;
+    box-shadow: 0 0 10px #0ffd;
+  }
+}

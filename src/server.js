@@ -32,18 +32,29 @@ exports.createServer = async (controller) => {
             }
           );
           break;
-        case route(req, "GET", "/logo.svg"):
+        case route(req, "GET", /.*\.(js|css|html|svg|ico|png|jpg|webp)$/):
           fs.readFile(
-            path.join(__dirname, "../public", "logo.svg"),
+            path.join(__dirname, "../public", req.url),
             (err, data) => {
               if (err) {
                 console.error(err);
-                res.writeHead(500, { "Content-Type": "text/plain" });
-                res.end("Internal server error");
+                res.writeHead(404, { "Content-Type": "text/plain" });
+                res.end("Not found");
                 return;
               }
 
-              res.writeHead(200, { "Content-Type": "image/svg+xml" });
+              const contentType = {
+                js: "application/javascript",
+                css: "text/css",
+                html: "text/html",
+                svg: "image/svg+xml",
+                ico: "image/x-icon",
+                png: "image/png",
+                jpg: "image/jpeg",
+                webp: "image/webp",
+              }[req.url?.split(".").at(-1) ?? ""];
+
+              res.writeHead(200, { "Content-Type": contentType });
               res.end(data);
             }
           );
@@ -100,6 +111,10 @@ exports.createServer = async (controller) => {
         cb?.(null, port);
       });
     },
+    /**
+     *
+     * @param {(err?: Error) => void} cb
+     */
     close: (cb) => {
       server.close(cb);
     },
