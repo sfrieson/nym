@@ -67,7 +67,7 @@ function waitForAnimation(el, modify) {
   });
 }
 
-const debug = true;
+const debug = false;
 function queryAcronym(acronym) {
   if (debug) {
     return new Promise((resolve, reject) => {
