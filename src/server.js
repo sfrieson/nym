@@ -109,6 +109,7 @@ exports.createServer = async (controller) => {
           // Parse form-encoded data
           const formData = new URLSearchParams(body);
           const text = formData.get("text");
+          console.log({ text });
 
           res.writeHead(200, { "Content-Type": "text/plain" });
           if (!text) {
