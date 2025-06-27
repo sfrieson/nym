@@ -118,7 +118,7 @@ exports.createServer = async (controller) => {
           }
 
           const words = text.split(" ");
-          if (words.length < 2) {
+          if (words.length > 2) {
             res.end("Whoa whoa whoa... multiples? What do I look like? AI?");
             break;
           }
