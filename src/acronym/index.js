@@ -1,25 +1,17 @@
 const openai = require("openai");
-const { z } = require("zod");
 const { zodTextFormat } = require("openai/helpers/zod");
 const fs = require("fs/promises");
 const path = require("path");
+const { meaningSchema, responseMultiSchema, responseSingleSchema } = require("../types");
 
-const meaningSchema = z.object({
-  meaning: z.string(),
-  explanation: z.string(),
-});
-
-const responseSchema = z.object({
-  meanings: z.array(meaningSchema),
-});
-
-const format = zodTextFormat(responseSchema, "response");
+const singleMeaningFormat = zodTextFormat(responseSingleSchema, "response");
+const multiMeaningFormat = zodTextFormat(responseMultiSchema, "response");
 
 /**
  * @param {string} text
- * @returns {z.infer<typeof responseSchema>}
+ * @returns {import('../types').MultiMeaningResponse}
  */
-function parseResponse(text) {
+function parseMultiResponse(text) {
   console.log(text);
   try {
     const json = JSON.parse(text);
@@ -27,7 +19,29 @@ function parseResponse(text) {
       throw new Error(json.error);
     }
 
-    return responseSchema.parse(json);
+    return responseMultiSchema.parse(json);
+  } catch (error) {
+    console.error(error);
+    if (error instanceof Error) {
+      throw new Error(`Failed to parse response: ${error.message}`);
+    }
+    throw error;
+  }
+}
+
+/**
+ * @param {string} text
+ * @returns {import('../types').SingleMeaningResponse}
+ */
+function parseSingleResponse(text) {
+  console.log(text);
+  try {
+    const json = JSON.parse(text);
+    if (json.error) {
+      throw new Error(json.error);
+    }
+
+    return responseSingleSchema.parse(json);
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {
@@ -47,29 +61,51 @@ exports.createAcronymController = async function () {
   return {
     /**
      * @param {string} acronym
-     * @returns {Promise<{} | any[]>}
+     * @returns {Promise<import('../types').AcronymMultiResponse>}
      */
-    async generateMeaning(acronym) {
-      const thoughtfulResponse = await client.responses.create({
+    async generateMeanings(acronym) {
+      const response = await client.responses.create({
         model: "gpt-4.1-2025-04-14",
         instructions: basePrompt,
-        input: `Please come up with a few possible meanings for the following letters: ${acronym}`,
-        temperature: 1.2,
-        top_p: 0.5,
+        input: `Please come up with a few possible meanings for the following letters: ${acronym}. Avoid common/overused words and aim for creative variety. Please provide 5-10 meanings.`,
+        temperature: 0.9,
+        top_p: 0.8,
         store: false,
+        text: { format: multiMeaningFormat },
       });
 
+      // const response = await client.responses.create({
+      //   model: "gpt-4.1-nano-2025-04-14",
+      //   instructions:
+      //     "You are a data input specialist. You are reading the notes from a meeting about a possible meanings for an acronym. You are to accurately extract and format the list meanings from the notes.",
+      //   input: thoughtfulResponse.output_text,
+      //   text: { format },
+      // });
+
+      return {
+        acronym,
+        meanings: parseMultiResponse(response.output_text).meanings,
+      };
+    },
+
+    /**
+     * @param {string} acronym
+     * @returns {Promise<import('../types').AcronymSingleResponse>}
+     */
+    async generateMeaning(acronym) {
       const response = await client.responses.create({
-        model: "gpt-4.1-nano-2025-04-14",
-        instructions:
-          "You are a data input specialist. You are reading the notes from a meeting about a possible meanings for an acronym. You are to accurately extract and format the list meanings from the notes.",
-        input: thoughtfulResponse.output_text,
-        text: { format },
+        model: "gpt-4.1-2025-04-14",
+        instructions: basePrompt,
+        input: `Please come up with a random possible meaning for the following letters: ${acronym}. Avoid common/overused words and aim for creative variety.`,
+        temperature: 0.9,
+        top_p: 0.8,
+        store: false,
+        text: { format: singleMeaningFormat },
       });
 
       return {
         acronym,
-        meanings: parseResponse(response.output_text).meanings,
+        meaning: parseSingleResponse(response.output_text).meaning,
       };
     },
   };

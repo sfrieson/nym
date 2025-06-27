@@ -1,10 +1,11 @@
 const http = require("http");
+const https = require("https");
 const fs = require("fs");
 const path = require("path");
 const url = require("url");
 
 /**
- * @param {{ generateMeaning: (acronym: string) => Promise<{} | any[]> }} controller
+ * @param {{ generateMeanings: (acronym: string) => Promise<import('./types').AcronymMultiResponse>, generateMeaning: (acronym: string) => Promise<import('./types').AcronymSingleResponse> }} controller
  */
 exports.createServer = async (controller) => {
   const server = http.createServer(async (req, res) => {
@@ -86,10 +87,77 @@ exports.createServer = async (controller) => {
             break;
           }
 
-          const meaningsResponse = await controller.generateMeaning(acronym);
+          const meaningsResponse = await controller.generateMeanings(acronym);
 
           res.writeHead(200, { "Content-Type": "application/json" });
           res.end(JSON.stringify(meaningsResponse));
+          break;
+        }
+        // slack bot endpoint
+        case route(req, "POST", /^\/slackronym/): {
+          // Parse form-encoded body
+          const body = await new Promise((resolve, reject) => {
+            let body = "";
+            req.on("data", (chunk) => {
+              body += chunk;
+            });
+            req.on("end", () => {
+              resolve(body);
+            });
+          });
+
+          // Parse form-encoded data
+          const formData = new URLSearchParams(body);
+          const text = formData.get("text");
+
+          res.writeHead(200, { "Content-Type": "text/plain" });
+          if (!text) {
+            res.end("Well... what do you want me to define?");
+            break;
+          }
+
+          const words = text.split(" ");
+          if (words.length < 2) {
+            res.end("Whoa whoa whoa... multiples? What do I look like? AI?");
+            break;
+          }
+
+          const acronym = words[0];
+          if (acronym.length > 20) {
+            res.end("That's a long freakin acronym... Are you sure bout that?");
+            break;
+          }
+
+          if (acronym.length < 2) {
+            res.end("That's just a letter...");
+            break;
+          }
+
+          res.end("Looking it up...");
+          const responseUrl = formData.get("response_url");
+          if (!responseUrl) {
+            res.end("No response URL found");
+            break;
+          }
+
+          const meaningResponse = await controller.generateMeaning(acronym);
+
+          const message = `*${acronym}*: ${meaningResponse.meaning.meaning}\n_${meaningResponse.meaning.explanation}_`;
+
+          const request = https.request(responseUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          request.write(
+            JSON.stringify({
+              text: message,
+              response_type: "in_channel",
+            })
+          );
+          request.end();
+
           break;
         }
         default:
