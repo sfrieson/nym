@@ -1,8 +1,14 @@
 const server = require("./server");
 const acronymController = require("./acronym");
+const status = require("./status");
 
 acronymController.createAcronymController().then((controller) => {
-  server.createServer(controller).then((server) => {
+  const controllerWithStatus = {
+    ...controller,
+    randomStatus: status.randomStatus,
+  };
+
+  server.createServer(controllerWithStatus).then((server) => {
     server.listen(process.env.PORT ?? 3112, async (err, port) => {
       if (err) {
         console.error(err);

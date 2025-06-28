@@ -5,7 +5,11 @@ const path = require("path");
 const url = require("url");
 
 /**
- * @param {{ generateMeanings: (acronym: string) => Promise<import('./types').AcronymMultiResponse>, generateMeaning: (acronym: string) => Promise<import('./types').AcronymSingleResponse> }} controller
+ * @param {{
+ * generateMeanings: (acronym: string) => Promise<import('./types').AcronymMultiResponse>,
+ * generateMeaning: (acronym: string) => Promise<import('./types').AcronymSingleResponse>,
+ * randomStatus: (acronym: string) => string,
+ * }} controller
  */
 exports.createServer = async (controller) => {
   const server = http.createServer(async (req, res) => {
@@ -134,7 +138,7 @@ exports.createServer = async (controller) => {
             break;
           }
 
-          res.end("Looking it up...");
+          res.end(controller.randomStatus(acronym));
           const responseUrl = formData.get("response_url");
           if (!responseUrl) {
             res.end("No response URL found");
