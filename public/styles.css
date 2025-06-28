@@ -8,8 +8,8 @@ canvas {
 }
 
 form:focus-within {
-  border-color: #0ffd;
-  box-shadow: 0 0 10px #0ffd;
+  border-color: rgba(66, 142, 235, 0.933);
+  /* box-shadow: 0 0 10px #0ffd; */
 }
 
 .responses {

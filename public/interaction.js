@@ -10,7 +10,6 @@ form.addEventListener("submit", async (e) => {
 
   const button = form.querySelector("button");
   button.disabled = true;
-  button.textContent = "Creating...";
   const meaningsContainer = document.getElementById("meanings");
   meaningsContainer.innerHTML = "";
 
@@ -44,7 +43,6 @@ form.addEventListener("submit", async (e) => {
   } finally {
     card.classList.remove("thinking");
     button.disabled = false;
-    button.textContent = "Create";
     document.dispatchEvent(RequestEndEvent);
   }
 });
