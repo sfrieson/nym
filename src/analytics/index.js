@@ -1,4 +1,5 @@
 import { PostHog } from "posthog-node";
+import { expect } from "../util";
 
 /**
  * @type {PostHog}
@@ -6,9 +7,12 @@ import { PostHog } from "posthog-node";
 let client;
 
 export function init() {
-  client = new PostHog(process.env.POSTHOG_API_KEY, {
-    host: "https://us.i.posthog.com",
-  });
+  client = new PostHog(
+    expect(process.env.POSTHOG_API_KEY, "POSTHOG_API_KEY is not set"),
+    {
+      host: "https://us.i.posthog.com",
+    }
+  );
 
   return {
     shutdown: () => client.shutdown(),
