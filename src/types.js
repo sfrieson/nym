@@ -9,6 +9,12 @@ const meaningSchema = z.object({
 const responseMultiSchema = z.object({
   meanings: z.array(meaningSchema),
 });
+const responseMultiSchemaWithScratchPad = z.object({
+  scratchPad: z
+    .string()
+    .describe("A private place to write your thoughts, previous drafts, etc."),
+  meanings: z.array(meaningSchema),
+});
 
 const responseSingleSchema = z.object({
   meaning: meaningSchema,
@@ -27,4 +33,5 @@ module.exports = {
   meaningSchema,
   responseMultiSchema,
   responseSingleSchema,
+  responseMultiSchemaWithScratchPad,
 };

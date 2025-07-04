@@ -41,6 +41,7 @@ const statuses = [
   () => `I guess my bathroom break is over...`,
   () => `Why does this folder smell like burned synergy?`,
   () => `These acronyms aren't going to write themselves...`,
+  () => `Wait... this acronym wasn’t on the onboarding exam... was it?`,
 ];
 
 /**

@@ -2,10 +2,19 @@ const openai = require("openai");
 const { zodTextFormat } = require("openai/helpers/zod");
 const fs = require("fs/promises");
 const path = require("path");
-const { meaningSchema, responseMultiSchema, responseSingleSchema } = require("../types");
+const {
+  meaningSchema,
+  responseMultiSchema,
+  responseSingleSchema,
+  responseMultiSchemaWithScratchPad,
+} = require("../types");
 
 const singleMeaningFormat = zodTextFormat(responseSingleSchema, "response");
 const multiMeaningFormat = zodTextFormat(responseMultiSchema, "response");
+const multiMeaningFormatWithScratchPad = zodTextFormat(
+  responseMultiSchemaWithScratchPad,
+  "response"
+);
 
 /**
  * @param {string} text
@@ -52,11 +61,7 @@ function parseSingleResponse(text) {
 }
 
 exports.createAcronymController = async function () {
-  const client = new openai.OpenAI();
-  const basePrompt = await fs.readFile(
-    path.join(__dirname, "base-prompt-2.txt"),
-    "utf-8"
-  );
+  const llm = await createLLMClient();
 
   return {
     /**
@@ -64,27 +69,13 @@ exports.createAcronymController = async function () {
      * @returns {Promise<import('../types').AcronymMultiResponse>}
      */
     async generateMeanings(acronym) {
-      const response = await client.responses.create({
-        model: "gpt-4.1-2025-04-14",
-        instructions: basePrompt,
-        input: `Please come up with a few possible meanings for the following letters: ${acronym}. Avoid common/overused words and aim for creative variety. Please provide 5-10 meanings.`,
-        temperature: 0.9,
-        top_p: 0.8,
-        store: false,
-        text: { format: multiMeaningFormat },
-      });
-
-      // const response = await client.responses.create({
-      //   model: "gpt-4.1-nano-2025-04-14",
-      //   instructions:
-      //     "You are a data input specialist. You are reading the notes from a meeting about a possible meanings for an acronym. You are to accurately extract and format the list meanings from the notes.",
-      //   input: thoughtfulResponse.output_text,
-      //   text: { format },
-      // });
+      const meanings = await llm.generateSeveralMeaningsScrachPadPreThought(
+        acronym
+      );
 
       return {
         acronym,
-        meanings: parseMultiResponse(response.output_text).meanings,
+        meanings,
       };
     },
 
@@ -93,6 +84,93 @@ exports.createAcronymController = async function () {
      * @returns {Promise<import('../types').AcronymSingleResponse>}
      */
     async generateMeaning(acronym) {
+      const meaning = await llm.generateOneMeaning(acronym);
+
+      return {
+        acronym,
+        meaning,
+      };
+    },
+  };
+};
+
+const createLLMClient = async () => {
+  const client = new openai.OpenAI();
+  const basePrompt = await fs.readFile(
+    path.join(__dirname, "base-prompt-2.txt"),
+    "utf-8"
+  );
+  return {
+    /**
+     *
+     * @param {string} acronym
+     * @returns {Promise<{ meaning: string, explanation: string }[]>}
+     */
+    generateSeveralMeanings: async (acronym) => {
+      const input = `Please come up with a few possible meanings for the following letters: ${acronym}. Avoid common/overused words and aim for creative variety. Please provide 5-10 meanings.`;
+      const response = await client.responses.create({
+        model: "gpt-4.1-2025-04-14",
+        instructions: basePrompt,
+        input,
+        temperature: 0.9,
+        top_p: 0.8,
+        store: false,
+        text: { format: multiMeaningFormat },
+      });
+
+      return parseMultiResponse(response.output_text).meanings;
+    },
+    /**
+     *
+     * @param {string} acronym
+     * @returns {Promise<{ meaning: string, explanation: string }[]>}
+     */
+    generateSeveralMeaningsScrachPad: async (acronym) => {
+      const input = `Please come up with a few possible meanings for the following letters: ${acronym}. Avoid common/overused words and aim for creative variety. Please provide 5-10 meanings.`;
+      const response = await client.responses.create({
+        model: "gpt-4.1-2025-04-14",
+        instructions: basePrompt,
+        input,
+        temperature: 0.9,
+        top_p: 0.8,
+        store: false,
+        text: { format: multiMeaningFormatWithScratchPad },
+      });
+      console.log({ response });
+
+      return parseMultiResponse(response.output_text).meanings;
+    },
+    /**
+     *
+     * @param {string} acronym
+     * @returns {Promise<{ meaning: string, explanation: string }[]>}
+     */
+    generateSeveralMeaningsScrachPadPreThought: async (acronym) => {
+      const input = `I would like you to come up with a 5-10 possible meanings for the following letters: ${acronym}.
+
+Take your time in coming up with truly great, funny acronym. Feel free to brainstorm sets of words for each letter to help you find truly great ones and see how they will play with eachother.
+Also think about different industries/intrests groups words like: sales, tech, gamers, parents, sports, shopping, and more. Anything to make a funny, relateable acronym.
+As you draft self-critique your choices and iterate. You don't have to use your first draft choices in your final results.
+Have fun and make some great zingers!`;
+      const response = await client.responses.create({
+        model: "gpt-4.1-2025-04-14",
+        instructions: basePrompt,
+        input,
+        temperature: 0.9,
+        top_p: 0.8,
+        store: false,
+        text: { format: multiMeaningFormatWithScratchPad },
+      });
+      console.log({ response });
+
+      return parseMultiResponse(response.output_text).meanings;
+    },
+    /**
+     *
+     * @param {string} acronym
+     * @returns {Promise<{ meaning: string, explanation: string }>}
+     */
+    async generateOneMeaning(acronym) {
       const response = await client.responses.create({
         model: "gpt-4.1-2025-04-14",
         instructions: basePrompt,
@@ -103,10 +181,7 @@ exports.createAcronymController = async function () {
         text: { format: singleMeaningFormat },
       });
 
-      return {
-        acronym,
-        meaning: parseSingleResponse(response.output_text).meaning,
-      };
+      return parseSingleResponse(response.output_text).meaning;
     },
   };
 };
