@@ -3,16 +3,27 @@ const https = require("https");
 const fs = require("fs");
 const path = require("path");
 const url = require("url");
+const { createHmac } = require("crypto");
+
+const MIN_ACRONYM_LENGTH = 2;
+const MAX_ACRONYM_LENGTH = 20;
 
 /**
  * @param {{
  * generateMeanings: (acronym: string) => Promise<import('./types').AcronymMultiResponse>,
  * generateMeaning: (acronym: string) => Promise<import('./types').AcronymSingleResponse>,
  * randomStatus: (acronym: string) => string,
+ * analytics: {
+ *  createRequestClient: (properties: Record<string, any>) => {
+ *    track: (event: string, properties?: Record<string, any>) => void,
+ *    update: (properties: Record<string, any>, overwrite?: boolean) => void,
+ *  },
+ * },
  * }} controller
  */
 exports.createServer = async (controller) => {
   const server = http.createServer(async (req, res) => {
+    const analytics = controller.analytics.createRequestClient({});
     try {
       if (!req.url) {
         res.writeHead(400, { "Content-Type": "text/plain" });
@@ -23,6 +34,9 @@ exports.createServer = async (controller) => {
       console.log(req.method, req.url);
       switch (true) {
         case route(req, "GET", "/"):
+          analytics.track("page_view", {
+            client: "web",
+          });
           fs.readFile(
             path.join(__dirname, "view", "index.html"),
             (err, data) => {
@@ -69,9 +83,20 @@ exports.createServer = async (controller) => {
           break;
 
         case route(req, "GET", /^\/acronym/): {
-          if (req.url.length > "/acronym".length + 20) {
+          analytics.update({
+            client: "web",
+            distinctId: req.headers["x-user-id"] ?? "anonymous",
+            sessionId: req.headers["x-session-id"] ?? "anonymous",
+            requestId: req.headers["x-request-id"] ?? "anonymous",
+          });
+          if (req.url.length > "/acronym?q=".length + MAX_ACRONYM_LENGTH) {
             res.writeHead(400, { "Content-Type": "text/plain" });
             res.end("Acronym too long");
+            break;
+          }
+          if (req.url.length < "/acronym?q=".length + MIN_ACRONYM_LENGTH) {
+            res.writeHead(400, { "Content-Type": "text/plain" });
+            res.end("Acronym too short");
             break;
           }
 
@@ -79,6 +104,9 @@ exports.createServer = async (controller) => {
           const { q } = query;
 
           const acronym = Array.isArray(q) ? q.at(0) : q;
+          analytics.update({
+            acronym,
+          });
           if (!acronym) {
             res.writeHead(400, { "Content-Type": "text/plain" });
             res.end("Acronym is required");
@@ -91,7 +119,13 @@ exports.createServer = async (controller) => {
             break;
           }
 
+          const getLatency = createLatency();
           const meaningsResponse = await controller.generateMeanings(acronym);
+
+          analytics.track("acronyms_generated", {
+            latency: getLatency(),
+            meaningsCount: meaningsResponse.meanings.length,
+          });
 
           res.writeHead(200, { "Content-Type": "application/json" });
           res.end(JSON.stringify(meaningsResponse));
@@ -100,6 +134,9 @@ exports.createServer = async (controller) => {
         // slack bot endpoint
         case route(req, "POST", /^\/slackronym/): {
           // Parse form-encoded body
+          const analytics = controller.analytics.createRequestClient({
+            client: "slack",
+          });
           const body = await new Promise((resolve, reject) => {
             let body = "";
             req.on("data", (chunk) => {
@@ -113,8 +150,8 @@ exports.createServer = async (controller) => {
           // Parse form-encoded data
           const formData = new URLSearchParams(body);
           const text = formData.get("text");
-          console.log({ text });
 
+          // Acknowledge the request
           res.writeHead(200, { "Content-Type": "text/plain" });
           if (!text) {
             res.end("Well... what do you want me to define?");
@@ -128,12 +165,12 @@ exports.createServer = async (controller) => {
           }
 
           const acronym = words[0];
-          if (acronym.length > 20) {
+          if (acronym.length > MAX_ACRONYM_LENGTH) {
             res.end("That's a long freakin acronym... Are you sure bout that?");
             break;
           }
 
-          if (acronym.length < 2) {
+          if (acronym.length < MIN_ACRONYM_LENGTH) {
             res.end("That's just a letter...");
             break;
           }
@@ -144,9 +181,22 @@ exports.createServer = async (controller) => {
             res.end("No response URL found");
             break;
           }
+          analytics.update({
+            acronym,
+            distinctId: getAnonSlackId(
+              formData.get("user_id") ?? "anonymous-user"
+            ),
+            slackInstallId: getAnonSlackId(
+              formData.get("api_app_id") ?? "anonymous-install"
+            ),
+          });
 
+          const getLatency = createLatency();
           const meaningResponse = await controller.generateMeaning(acronym);
 
+          analytics.track("acronym_generated", {
+            latency: getLatency(),
+          });
           const message = `*${acronym}*: ${meaningResponse.meaning.meaning}\n_${meaningResponse.meaning.explanation}_`;
 
           const request = https.request(responseUrl, {
@@ -213,4 +263,20 @@ function route(req, method, path) {
   }
 
   return true;
+}
+
+const SECRET_SALT =
+  process.env.SLACK_HASH_SALT ?? "why in the world is this not set????!‽‽‽@??!";
+
+/**
+ * @param {string} slackId
+ * @returns {string}
+ */
+function getAnonSlackId(slackId) {
+  return createHmac("sha256", SECRET_SALT).update(slackId).digest("hex");
+}
+
+function createLatency() {
+  const start = performance.now();
+  return () => Math.round(performance.now() - start);
 }

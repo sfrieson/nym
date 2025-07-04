@@ -72,7 +72,7 @@ function queryAcronym(acronym) {
       setTimeout(() => resolve(mockData), 5000);
     });
   }
-  return fetch(`/acronym?q=${acronym}`).then((res) => res.json());
+  return api(`/acronym?q=${acronym}`).then((res) => res.json());
 }
 
 const RequestStartEvent = new CustomEvent("request-start");
@@ -117,3 +117,23 @@ const mockData = {
     },
   ],
 };
+
+function getRandomId() {
+  try {
+    return crypto.randomUUID();
+  } catch (error) {
+    return Math.random().toString(36).substring(2, 15);
+  }
+}
+const userId = "anonymous";
+const sessionId = getRandomId();
+function api(endpoint) {
+  const id = getRandomId();
+  return fetch(endpoint, {
+    headers: {
+      "X-User-Id": userId,
+      "X-Session-Id": sessionId,
+      "X-Request-Id": id,
+    },
+  });
+}
