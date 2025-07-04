@@ -1,12 +1,13 @@
-import { PostHog } from "posthog-node";
-import { expect } from "../util";
+const { PostHog } = require("posthog-node");
+
+const { expect } = require("../util.js");
 
 /**
  * @type {PostHog}
  */
 let client;
 
-export function init() {
+function init() {
   client = new PostHog(
     expect(process.env.POSTHOG_API_KEY, "POSTHOG_API_KEY is not set"),
     {
@@ -58,3 +59,7 @@ export function init() {
  * @param {string} event
  * @param {Record<string, any>} properties
  */
+
+module.exports = {
+  init,
+};
