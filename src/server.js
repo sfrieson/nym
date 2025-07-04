@@ -33,6 +33,10 @@ exports.createServer = async (controller) => {
 
       console.log(req.method, req.url);
       switch (true) {
+        case route(req, "GET", "/healthcheck"):
+          res.writeHead(200, { "Content-Type": "text/plain" });
+          res.end("OK");
+          break;
         case route(req, "GET", "/"):
           analytics.track("page_view", {
             client: "web",
