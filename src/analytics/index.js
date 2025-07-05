@@ -8,10 +8,12 @@ const { expect } = require("../util.js");
 let client;
 
 function init() {
+  const disabled = process.env.POSTHOG_DISABLED === "true";
   client = new PostHog(
     expect(process.env.POSTHOG_API_KEY, "POSTHOG_API_KEY is not set"),
     {
       host: "https://us.i.posthog.com",
+      disabled,
     }
   );
 
@@ -33,6 +35,9 @@ function init() {
           event,
           { distinctId = ctx.distinctId ?? "anonymous", ...properties } = ctx
         ) => {
+          if (disabled) {
+            console.log("🐽", event, properties);
+          }
           client.capture({
             event,
             distinctId,
