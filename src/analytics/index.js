@@ -35,9 +35,11 @@ function init() {
           event,
           { distinctId = ctx.distinctId ?? "anonymous", ...properties } = ctx
         ) => {
+          if (distinctId === "opt-out") return;
           if (disabled) {
             console.log("🐽", event, properties);
           }
+
           client.capture({
             event,
             distinctId,

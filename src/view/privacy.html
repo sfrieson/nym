@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nym Privacy Policy</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      .nav-container {
+        background-color: rgba(66, 142, 235, 0.2533);
+      }
+      .nav {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .logo {
+        width: 100px;
+      }
+      main {
+        max-width: 600px;
+        margin: 2rem auto;
+      }
+      code {
+        background-color: #0001;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+      }
+
+      .user-settings-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .user-id-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .user-id-label {
+        display: block;
+        & input {
+          width: 20rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="nav-container">
+      <nav class="nav">
+        <a href="/">Back to nym</a>
+        <a href="#your-settings">Jump to your settings</a>
+      </nav>
+    </div>
+    <main>
+      <img src="/logo.svg" alt="nym logo" class="logo" />
+      <h1>nym Privacy Policy</h1>
+      <p>
+        nym is a satiricial project that generates meanings for the endless list
+        of acronyms out there. The goal is to make you laugh.
+      </p>
+      <section>
+        <h2>What data do we collect?</h2>
+        <p>
+          Since there are no accounts, we don't know who you are on the nym
+          website. For the purposes of
+          <a href="#product-analytics">product analytics</a>, we assign every
+          user a random ID when they visit the website. Your current ID is
+          <code id="preview-user-id">anonymous</code>. You can change it
+          <a href="#your-settings">below</a>
+          if you'd like, as frequently as you'd like. You can also set it to the
+          group anonymous ID.
+        </p>
+        <p>
+          If you use nym in Slack, Slack does know who you are and sends
+          identifying data along when you interact with the nym app. We do not
+          store or log any of that data. Instead, we do pseudonymize the data
+          before sending it to our analytics provider PostHog. This means we
+          generate a new ID by hashing your Slack user ID. This process is
+          one-way — we cannot use it to recover your original Slack ID and
+          figure out who you are.
+        </p>
+        <p>
+          We do not use cookies, fingerprinting, or other tracking technologies
+          on the nym website.
+        </p>
+        <p id="product-analytics">
+          We do collect some data about how you use the nym website and Slack
+          app to help us
+          <a href="#improve-the-experience">improve the experience</a>. We
+          collect information like what you searched for, what feedback you gave
+          on the results, which pages you visited, and what you clicked on.
+        </p>
+        <p>
+          Again, this is all linked to a random ID for you on the website or a
+          pseudonymized ID for you in Slack. Since you cannot change your Slack
+          ID, the pseudonymized ID automatically changes every month. You may
+          change your website ID at any time by clicking the button below. If
+          you would prefer to not have a personal website ID, you can set it to
+          the group anonymous ID.
+        </p>
+      </section>
+      <section>
+        <h2 id="improve-the-experience">How do we use your data?</h2>
+        <p>
+          We use your activity data on this website or usage of the Slack app to
+          improve the nym website and Slack app.
+        </p>
+        <p>
+          We use <a href="https://posthog.com/privacy">PostHog</a>, a
+          third-party analytics tool, to analyze usage of the nym website and
+          Slack app. We do that to answer questions like, "How many times to
+          people search in a session?" or "Do people keep coming back?" or "How
+          is this AI model performing compared to the previous one?" We would
+          appreciate it if you would help out by allowing this data to be
+          collected — it helps us make nym better, but if you'd prefer not to,
+          that's completely fine.
+        </p>
+      </section>
+      <section>
+        <h2>Opting out</h2>
+        <p>
+          There is a <a href="#your-settings">form below</a> where you can set
+          your settings including opting out. Since you do not have an account,
+          we cannot reliably save your opt-out preference. It may get lost if
+          you clear your browser data or visit in a private window.
+        </p>
+      </section>
+      <section>
+        <h2 id="your-settings">Your settings</h2>
+        <form id="user-settings-form" class="user-settings-form">
+          <div class="user-id-container">
+            <label for="user-id" class="user-id-label">
+              <span>User Id:</span>
+              <input
+                type="text"
+                name="user-id"
+                id="user-id"
+                value="anonymous"
+              />
+            </label>
+            <div>
+              <button name="new-random-id" type="button" id="change-user-id">
+                New random ID
+              </button>
+              <button name="anonymous-id" type="button" id="anonymous-user-id">
+                Anonymous ID
+              </button>
+            </div>
+          </div>
+          <div>
+            <label>
+              <input
+                type="checkbox"
+                name="analytics"
+                id="analytics"
+                checked="checked"
+              />
+              Allow product analytics collection
+            </label>
+          </div>
+          <div>
+            <button type="submit">Save</button>
+          </div>
+        </form>
+      </section>
+    </main>
+    <script>
+      const userSettings = getUserSettings();
+      document.getElementById("preview-user-id").textContent =
+        userSettings.userId;
+      document.getElementById("user-id").value = userSettings.userId;
+      document
+        .getElementById("change-user-id")
+        .addEventListener("click", () => {
+          document.getElementById("user-id").value = getRandomId();
+        });
+      document
+        .getElementById("anonymous-user-id")
+        .addEventListener("click", () => {
+          document.getElementById("user-id").value = "anonymous";
+        });
+      document.getElementById("analytics").checked = userSettings.analytics;
+      document
+        .getElementById("user-settings-form")
+        .addEventListener("submit", (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          console.log("analytics", formData.get("analytics"));
+          const settings = {
+            userId: formData.get("user-id"),
+            analytics: formData.get("analytics") === "on",
+          };
+          localStorage.setItem("user-settings", JSON.stringify(settings));
+          window.location.reload();
+        });
+
+      function getUserSettings() {
+        const userSettings = localStorage.getItem("user-settings");
+        if (!userSettings) {
+          const settings = {
+            userId: getRandomId(),
+            analytics: true,
+          };
+          localStorage.setItem("user-settings", JSON.stringify(settings));
+          return settings;
+        }
+
+        return JSON.parse(userSettings);
+      }
+
+      function getRandomId() {
+        try {
+          return crypto.randomUUID();
+        } catch (error) {
+          return Math.random().toString(36).substring(2, 15);
+        }
+      }
+    </script>
+  </body>
+</html>

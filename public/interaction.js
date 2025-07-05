@@ -79,15 +79,36 @@ function getRandomId() {
     return Math.random().toString(36).substring(2, 15);
   }
 }
-const userId = "anonymous";
-const sessionId = getRandomId();
+let sessionId = getRandomId();
 function api(endpoint) {
   const id = getRandomId();
+  let userSettings = getUserSettings();
   return fetch(endpoint, {
     headers: {
-      "X-User-Id": userId,
+      "X-User-Id": userSettings.analytics ? userSettings.userId : "opt-out",
       "X-Session-Id": sessionId,
       "X-Request-Id": id,
     },
   });
 }
+
+function getUserSettings() {
+  const userSettings = localStorage.getItem("user-settings");
+  if (!userSettings) {
+    const settings = {
+      userId: getRandomId(),
+      analytics: true,
+    };
+    localStorage.setItem("user-settings", JSON.stringify(settings));
+    return settings;
+  }
+
+  return JSON.parse(userSettings);
+}
+
+window.addEventListener("storage", (e) => {
+  if (e.key === "user-settings") {
+    // Change the session ID to avoid having a way to track that the user changed their settings
+    sessionId = getRandomId();
+  }
+});

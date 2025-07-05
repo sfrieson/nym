@@ -38,6 +38,24 @@ exports.createServer = async (controller) => {
           res.writeHead(200, { "Content-Type": "text/plain" });
           res.end("OK");
           break;
+        case route(req, "GET", "/privacy.html"):
+          analytics.track("page_view", {
+            client: "web",
+          });
+          fs.readFile(
+            path.join(__dirname, "view", "privacy.html"),
+            (err, data) => {
+              if (err) {
+                res.writeHead(500, { "Content-Type": "text/plain" });
+                res.end("Internal server error");
+                return;
+              }
+
+              res.writeHead(200, { "Content-Type": "text/html" });
+              res.end(data);
+            }
+          );
+          break;
         case route(req, "GET", "/"):
           analytics.track("page_view", {
             client: "web",
@@ -194,10 +212,16 @@ exports.createServer = async (controller) => {
             res.end("No response URL found");
             break;
           }
+          const d = new Date();
+          const month = d.getMonth();
+          const year = d.getFullYear();
+
           analytics.update({
             acronym,
+            // Slack user's can't change their user ID, so allow them some extra
+            // anonymity by changing their hashed id every month
             distinctId: getAnonSlackId(
-              formData.get("user_id") ?? "anonymous-user"
+              `${year}-${month}-${formData.get("user_id")}`
             ),
             slackInstallId: getAnonSlackId(
               formData.get("api_app_id") ?? "anonymous-install"
