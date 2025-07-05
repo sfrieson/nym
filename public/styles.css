@@ -29,14 +29,70 @@ form:focus-within {
 }
 
 .responses.visible {
-  opacity: 1
+  opacity: 1;
+}
+
+.meaning {
+  padding: 16px 0;
+  border-bottom: 1px solid #0001;
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .meaning-title {
-  margin-bottom: 0;
+  margin: 0;
 }
+
 .meaning-explanation {
-  margin: 8px 0;
+  margin: 0;
+}
+
+.meaning-content {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.meaning-feedback {
+  display: flex;
+}
+
+.meaning-explanation-container {
+  flex: 1;
+}
+.feedback-button {
+  width: 44px;
+  height: 44px;
+  background-color: transparent;
+  border: 1px solid rgba(66, 142, 235, 0.2533);
+  transition: background-color 0.2s ease-out, color 0.2s ease-out;
+  color: #999;
+  .meaning:hover & {
+    background-color: rgba(66, 142, 235, 0.2533);
+    color: #333;
+
+    &:hover {
+      background-color: rgba(66, 142, 235, 0.533);
+      transition-duration: 0.05s;
+    }
+  }
+
+  & svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.feedback-button:first-child {
+  border-top-left-radius: 50%;
+  border-bottom-left-radius: 50%;
+  border-right: 1px solid #0001;
+}
+.feedback-button:last-child {
+  border-bottom-right-radius: 50%;
+  border-top-right-radius: 50%;
+  border-left: 1px solid #fff4;
 }
 
 @keyframes thinking {
