@@ -36,7 +36,7 @@ form:focus-within {
   margin-bottom: 0;
 }
 .meaning-explanation {
-  margin: 0;
+  margin: 8px 0;
 }
 
 @keyframes thinking {

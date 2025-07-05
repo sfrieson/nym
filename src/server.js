@@ -8,6 +8,7 @@ const { createHmac } = require("crypto");
 const MIN_ACRONYM_LENGTH = 2;
 const MAX_ACRONYM_LENGTH = 20;
 
+const debug = process.env.DEBUG_MEANINGS === "true";
 /**
  * @param {{
  * generateMeanings: (acronym: string) => Promise<import('./types').AcronymMultiResponse>,
@@ -124,7 +125,15 @@ exports.createServer = async (controller) => {
           }
 
           const getLatency = createLatency();
-          const meaningsResponse = await controller.generateMeanings(acronym);
+          let meaningsResponse;
+          if (debug) {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            meaningsResponse = JSON.parse(
+              fs.readFileSync(path.join(__dirname, "mock.json"), "utf8")
+            );
+          } else {
+            meaningsResponse = await controller.generateMeanings(acronym);
+          }
 
           analytics.track("acronyms_generated", {
             latency: getLatency(),
