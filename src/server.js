@@ -104,6 +104,26 @@ exports.createServer = async (controller) => {
             }
           );
           break;
+        case route(req, "POST", "/analytics"): {
+          const body = await new Promise((resolve, reject) => {
+            let body = "";
+            req.on("data", (chunk) => {
+              body += chunk;
+            });
+            req.on("end", () => {
+              resolve(body);
+            });
+            req.on("error", (err) => {
+              reject(err);
+            });
+          });
+          const { event, ...properties } = JSON.parse(body);
+          console.log(event, properties);
+          analytics.track(event, properties);
+          res.writeHead(200, { "Content-Type": "text/plain" });
+          res.end("OK");
+          break;
+        }
 
         case route(req, "GET", /^\/acronym/): {
           analytics.update({

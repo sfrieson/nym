@@ -33,11 +33,15 @@ function init() {
          */
         track: (
           event,
-          { distinctId = ctx.distinctId ?? "anonymous", ...properties } = ctx
+          {
+            userId = ctx.userId ?? "anonymous",
+            distinctId = ctx.distinctId ?? userId,
+            ...properties
+          } = ctx
         ) => {
           if (distinctId === "opt-out") return;
           if (disabled) {
-            console.log("🐽", event, properties);
+            console.log("🐽", event, { distinctId }, properties);
           }
 
           client.capture({

@@ -31,6 +31,29 @@ form.addEventListener("submit", async (e) => {
         meaning.meaning;
       meaningElement.querySelector(".meaning-explanation").textContent =
         meaning.explanation;
+      meaningElement.querySelectorAll("[data-feedback]").forEach((button) => {
+        button.addEventListener("click", (e) => {
+          e.preventDefault();
+          const userSettings = getUserSettings();
+          const sessionId = getRandomId();
+          const button = e.target;
+          /**
+           * @type {"like" | "dislike"}
+           */
+          const feedback = button.dataset.feedback;
+          navigator.sendBeacon(
+            `/analytics`,
+            JSON.stringify({
+              event: "meaning_feedback_click",
+              query: acronym,
+              meaning: meaning.meaning,
+              feedback,
+              userId: userSettings.analytics ? userSettings.userId : "opt-out",
+              sessionId,
+            })
+          );
+        });
+      });
       responses.appendChild(meaningElement);
     });
 
