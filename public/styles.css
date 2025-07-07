@@ -20,6 +20,11 @@ form:focus-within {
   opacity: 0;
   width: 100%;
   overflow: auto;
+  position: relative;
+}
+
+.meaning-list {
+  margin: 2em 0 8em;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -123,12 +128,14 @@ form:focus-within {
   align-items: center;
   justify-content: center;
   border: none;
+  box-sizing: border-box;
+  width: 40px;
 }
 
 .info-button {
   position: fixed;
   bottom: 10px;
-  right: 10px;
+  right: 20px;
   border-radius: 50%;
   aspect-ratio: 1;
   display: flex;
@@ -137,10 +144,18 @@ form:focus-within {
   border: none;
 }
 
+@media (min-width: 610px) {
+  .info-button {
+    right: 10px;
+  }
+}
+
 .info-dialog {
   border-radius: 16px;
   border-color: #0ffd;
   color: #333;
+  max-width: calc(100% - 20px);
+  box-sizing: border-box;
 }
 
 .close-button {

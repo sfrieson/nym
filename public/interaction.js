@@ -23,6 +23,7 @@ form.addEventListener("submit", async (e) => {
     const meanings = data.meanings;
 
     const responses = document.createElement("div");
+    responses.classList.add("meaning-list");
     meanings.forEach((meaning) => {
       const meaningTemplate = document.getElementById("meaning-template");
       const meaningElement = meaningTemplate.content.cloneNode(true);
