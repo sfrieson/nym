@@ -104,10 +104,10 @@ form:focus-within {
 }
 
 [data-feedback="like"].feedback-button.clicked {
-  color: #0f0;
+  color: #0fc70f;
 }
 [data-feedback="dislike"].feedback-button.clicked {
-  color: #f00;
+  color: #ce0707;
 }
 
 @keyframes thinking {
