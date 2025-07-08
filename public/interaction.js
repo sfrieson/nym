@@ -34,9 +34,17 @@ form.addEventListener("submit", async (e) => {
       meaningElement.querySelectorAll("[data-feedback]").forEach((button) => {
         button.addEventListener("click", (e) => {
           e.preventDefault();
+          const button = e.currentTarget;
+          console.log({ button });
+          if (!(button instanceof HTMLButtonElement)) return;
+          button.parentElement
+            .querySelectorAll("button.clicked")
+            .forEach((b) => {
+              b.classList.remove("clicked");
+            });
+          button.classList.add("clicked");
           const userSettings = getUserSettings();
           const sessionId = getRandomId();
-          const button = e.target;
           /**
            * @type {"like" | "dislike"}
            */

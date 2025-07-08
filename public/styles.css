@@ -103,6 +103,13 @@ form:focus-within {
   border-left: 1px solid #fff4;
 }
 
+[data-feedback="like"].feedback-button.clicked {
+  color: #0f0;
+}
+[data-feedback="dislike"].feedback-button.clicked {
+  color: #f00;
+}
+
 @keyframes thinking {
   0% {
     border-color: #fffd;
