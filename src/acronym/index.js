@@ -3,18 +3,10 @@ const { zodTextFormat } = require("openai/helpers/zod");
 const fs = require("fs/promises");
 const path = require("path");
 const {
-  meaningSchema,
   responseMultiSchema,
   responseSingleSchema,
   responseMultiSchemaWithScratchPad,
 } = require("../types");
-
-const singleMeaningFormat = zodTextFormat(responseSingleSchema, "response");
-const multiMeaningFormat = zodTextFormat(responseMultiSchema, "response");
-const multiMeaningFormatWithScratchPad = zodTextFormat(
-  responseMultiSchemaWithScratchPad,
-  "response"
-);
 
 /**
  * @param {string} text
@@ -60,15 +52,26 @@ function parseSingleResponse(text) {
   }
 }
 
-exports.createAcronymController = async function () {
-  const llm = await createLLMClient();
+exports.createAcronymController = function () {
+  let _llmClient;
+  /**
+   * @returns {Promise<ReturnType<typeof createLLMClient>>}
+   */
+  const llmClient = () => {
+    _llmClient ??= createLLMClient();
+    return _llmClient;
+  };
 
   return {
+    healthcheck: async () => {
+      await llmClient();
+    },
     /**
      * @param {string} acronym
      * @returns {Promise<import('../types').AcronymMultiResponse>}
      */
     async generateMeanings(acronym) {
+      const llm = await llmClient();
       const meanings = await llm.generateSeveralMeaningsScrachPadPreThought(
         acronym
       );
@@ -84,6 +87,7 @@ exports.createAcronymController = async function () {
      * @returns {Promise<import('../types').AcronymSingleResponse>}
      */
     async generateMeaning(acronym) {
+      const llm = await llmClient();
       const meaning = await llm.generateOneMeaning(acronym);
 
       return {
@@ -115,7 +119,7 @@ const createLLMClient = async () => {
         temperature: 0.9,
         top_p: 0.8,
         store: false,
-        text: { format: multiMeaningFormat },
+        text: { format: zodTextFormat(responseMultiSchema, "response") },
       });
 
       return parseMultiResponse(response.output_text).meanings;
@@ -134,7 +138,9 @@ const createLLMClient = async () => {
         temperature: 0.9,
         top_p: 0.8,
         store: false,
-        text: { format: multiMeaningFormatWithScratchPad },
+        text: {
+          format: zodTextFormat(responseMultiSchemaWithScratchPad, "response"),
+        },
       });
       console.log({ response });
 
@@ -159,7 +165,9 @@ Have fun and make some great zingers!`;
         temperature: 0.9,
         top_p: 0.8,
         store: false,
-        text: { format: multiMeaningFormatWithScratchPad },
+        text: {
+          format: zodTextFormat(responseMultiSchemaWithScratchPad, "response"),
+        },
       });
       console.log({ response });
 
@@ -178,7 +186,7 @@ Have fun and make some great zingers!`;
         temperature: 0.9,
         top_p: 0.8,
         store: false,
-        text: { format: singleMeaningFormat },
+        text: { format: zodTextFormat(responseSingleSchema, "response") },
       });
 
       return parseSingleResponse(response.output_text).meaning;

@@ -11,6 +11,7 @@ const MAX_ACRONYM_LENGTH = 20;
 const debug = process.env.DEBUG_MEANINGS === "true";
 /**
  * @param {{
+ * healthcheck: () => Promise<void>,
  * generateMeanings: (acronym: string) => Promise<import('./types').AcronymMultiResponse>,
  * generateMeaning: (acronym: string) => Promise<import('./types').AcronymSingleResponse>,
  * randomStatus: (acronym: string) => string,
@@ -35,6 +36,7 @@ exports.createServer = async (controller) => {
       console.log(req.method, req.url);
       switch (true) {
         case route(req, "GET", "/healthcheck"):
+          await controller.healthcheck();
           res.writeHead(200, { "Content-Type": "text/plain" });
           res.end("OK");
           break;
@@ -296,10 +298,15 @@ exports.createServer = async (controller) => {
     },
     /**
      *
-     * @param {(err?: Error) => void} cb
+     * @returns {Promise<void>}
      */
-    close: (cb) => {
-      server.close(cb);
+    close: () => {
+      return new Promise((resolve, reject) => {
+        server.close((err) => {
+          if (err) return reject(err);
+          resolve();
+        });
+      });
     },
   };
 };

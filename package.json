@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node -r dotenv/config --watch src/index.js",
+    "dev": "node --env-file=.env --watch src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,9 +18,6 @@
     "url": "https://github.com/sfrieson/nym/issues"
   },
   "homepage": "https://github.com/sfrieson/nym#readme",
-  "devDependencies": {
-    "dotenv": "^16.5.0"
-  },
   "dependencies": {
     "openai": "^5.1.1",
     "posthog-node": "^5.1.1",
