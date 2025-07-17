@@ -100,6 +100,7 @@ exports.createAcronymController = function () {
 
 const createLLMClient = async () => {
   const client = new openai.OpenAI();
+  console.log(await client.models.list());
   const basePrompt = await fs.readFile(
     path.join(__dirname, "base-prompt-2.txt"),
     "utf-8"
@@ -182,7 +183,12 @@ Have fun and make some great zingers!`;
       const response = await client.responses.create({
         model: "gpt-4.1-2025-04-14",
         instructions: basePrompt,
-        input: `Please come up with a random possible meaning for the following letters: ${acronym}. Avoid common/overused words and aim for creative variety.`,
+        input: `Please come up with a random possible meaning for the following letters: ${acronym}.
+
+Take your time in coming up with truly great, funny acronym. Feel free to brainstorm sets of words for each letter to help you find truly great ones and see how they will play with eachother.
+Also think about different industries/intrests groups words like: sales, tech, gamers, parents, sports, shopping, and more. Anything to make a funny, relateable acronym.
+As you draft self-critique your choices and iterate. You don't have to use your first draft choices in your final results.
+Have fun and make some great zingers!`,
         temperature: 0.9,
         top_p: 0.8,
         store: false,

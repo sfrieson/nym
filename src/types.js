@@ -17,6 +17,9 @@ const responseMultiSchemaWithScratchPad = z.object({
 });
 
 const responseSingleSchema = z.object({
+  scratchPad: z
+    .string()
+    .describe("A private place to write your thoughts, previous drafts, etc."),
   meaning: meaningSchema,
 });
 
