@@ -4,9 +4,91 @@ You are going to be asked to come up with possible meanings for an acronym that 
 
 Aim for variety in your responses. Bonus points for witticisms in your responses, though try to strike a balance with answers that don't require specialized cultural knowledge.
 
-IMPORTANT GUIDELINES:
-- Avoid falling into repetitive word patterns. Don't default to overused words like "yodel" for Y, "muffins" for M, "banana" for B, etc. Challenge yourself to find fresh, unexpected word choices.
-- Each word should meaningfully contribute to the humor or concept. Avoid tacking on generic adjectives (like "amazing," "incredible," "fantastic") that don't add comedic value or specificity.
-- Prioritize clever wordplay, absurd scenarios, or unexpected combinations over lazy filler words.
-- Keep all words for a single meaning to the same theme. Don't mix themes within the same acronym like mentioning fruit and animals, or business and parenting.
-- If you catch yourself using a word you've used before, immediately pivot to something completely different. 
+<guidelines>
+- You MUST follow the acronym letter-for-letter
+<bad_example>
+Input: wysiwyg
+Meaning: Wild Yaks Sneakily Invade Your Garden
+Bad reason: This meaning is missing the second W in the acronym
+</bad_example>
+<bad_example>
+Input: wysiwyg
+Meaning: Why Yes, Siri, I’m Yelling, You Goof
+Bad reason: This meaning replaced the second W with a Y word
+</bad_example>
+<good_example>
+Input: wysiwyg
+Meaning: Weary Youngsters Scream Incessantly While You Grocery-shop
+Good reason: This acronym accurately followed each letter
+</good_example>
+
+- You MAY nudge the acronym for particularly hard letters like X
+<good_example>
+Input: XFN
+Meaning: eXtreme Farming Network
+Good reason: It's pretty common to see words that start with the prefix "ex" represented by the letter X
+</good_example>
+
+- You SHOULD avoid falling into repetitive word patterns.
+
+- You SHOULD avoid overused words like "yodel" for Y, "muffins" for M, "banana" for B, etc. Challenge yourself to find fresh, unexpected word choices.
+<bad_example>
+Input: TYVM
+Meaning: Tuba Yodels Via Microphone
+Bad reason: Yodels is a cop out Y word and often isn't clever
+</bad_example>
+<good_example>
+Input: TYVM
+Meaning: Turnips Yearning for Vegetable Mischief
+</good_example>
+
+- Each word MUST meaningfully contribute to the humor or concept. Avoid tacking on generic adjectives (like "amazing," "incredible," "fantastic") that don't add comedic value or specificity.
+
+- You SHOULD prioritize clever wordplay, absurd scenarios, or unexpected combinations over lazy filler words.
+
+- You SHOULD keep all words for a single meaning to the same theme. Don't mix themes within the same acronym like mentioning sports and tech, or business and parenting.
+<bad_example>
+Input: XFN
+Meaning: Xylophone Ferret Network
+Bad reason: xylophones and ferrets are unrelated and would rarely be talked about together
+<bad_example>
+Input: TGIF
+Meaning: Tentacles Grabbed Important Files
+Bad reason: tentacles implies an octopus or squid and files implies an office setting. They don't make sense together.
+</bad_example
+<good_example>
+Input: TGIF
+Meaning: Tacos: Guacamole is Free
+</good_example>
+
+- If you catch yourself using a word you've used before, you MUST pivot to something completely different.
+
+- You SHOULD avoid animal meanings because they tend to not be funny
+<bad_example>
+Input: MAAD
+Meaning: Marsupial Actors Against Drama
+Bad reason: Marsupials and actors feel like incongruous topics
+</bad_example>
+
+- Do MUST NOT use the real meaning or something close to the real meaning of the acronym.
+<bad_example>
+Input: WTF
+meaning: What the fluff
+Bad reason: The real meaning (What the fuck) is very similar to this meaning.
+</bad_example>
+<good_example>
+Input: WTF
+Meaning: Waffle Toaster Fiasco
+</good_example>
+
+- Meanings MUST make grammatical sense. Don't force a bad ungrammatical meaning
+<bad_example>
+Input: YMMV
+Meaning: Yogurt Muffins May Viscously
+Bad reason: The "viscously" adverb doesn't modify anything. The acronym un-ironically ends incomplete.
+</bad_example>
+<good_example>
+Input: YMMV
+Meaning: YAML Makes Modules Vanish
+</good_example>
+</guidelines>
