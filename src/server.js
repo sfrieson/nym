@@ -292,7 +292,7 @@ exports.createServer = async (controller) => {
      * @param {(err: Error | null, port: number | string) => void} cb
      */
     listen: (port, cb) => {
-      server.listen(port, () => {
+      server.listen(port, "0.0.0.0", () => {
         cb?.(null, port);
       });
     },
