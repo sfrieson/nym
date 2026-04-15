@@ -22,6 +22,8 @@ server.createServer(controllerWithStatus).then((server) => {
     console.log(
       `Server is running on port ${port} in ${performance.now() - start}ms`
     );
+
+    controller.healthcheck().catch(console.error);
   });
   async function shutdown() {
     console.log("Shutting down...");

@@ -1,5 +1,3 @@
-const openai = require("openai");
-const { zodTextFormat } = require("openai/helpers/zod");
 const fs = require("fs/promises");
 const path = require("path");
 const {
@@ -99,8 +97,9 @@ exports.createAcronymController = function () {
 };
 
 const createLLMClient = async () => {
+  const openai = require("openai");
+  const { zodTextFormat } = require("openai/helpers/zod");
   const client = new openai.OpenAI();
-  console.log(await client.models.list());
   const basePrompt = await fs.readFile(
     path.join(__dirname, "base-prompt-2.txt"),
     "utf-8"
