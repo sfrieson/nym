@@ -50,6 +50,8 @@ function parseSingleResponse(text) {
   }
 }
 
+const MODEL = "gpt-6-luna";
+
 exports.createAcronymController = function () {
   let _llmClient;
   /**
@@ -113,11 +115,10 @@ const createLLMClient = async () => {
     generateSeveralMeanings: async (acronym) => {
       const input = `Please come up with a few possible meanings for the following letters: ${acronym}. Avoid common/overused words and aim for creative variety. Please provide 5-10 meanings.`;
       const response = await client.responses.create({
-        model: "gpt-4.1-2025-04-14",
+        model: MODEL,
         instructions: basePrompt,
         input,
-        temperature: 0.9,
-        top_p: 0.8,
+        reasoning: { effort: "low" },
         store: false,
         text: { format: zodTextFormat(responseMultiSchema, "response") },
       });
@@ -132,11 +133,10 @@ const createLLMClient = async () => {
     generateSeveralMeaningsScrachPad: async (acronym) => {
       const input = `Please come up with a few possible meanings for the following letters: ${acronym}. Avoid common/overused words and aim for creative variety. Please provide 5-10 meanings.`;
       const response = await client.responses.create({
-        model: "gpt-4.1-2025-04-14",
+        model: MODEL,
         instructions: basePrompt,
         input,
-        temperature: 0.9,
-        top_p: 0.8,
+        reasoning: { effort: "low" },
         store: false,
         text: {
           format: zodTextFormat(responseMultiSchemaWithScratchPad, "response"),
@@ -159,11 +159,10 @@ Also think about different industries/intrests groups words like: sales, tech, g
 As you draft self-critique your choices and iterate. You don't have to use your first draft choices in your final results.
 Have fun and make some great zingers!`;
       const response = await client.responses.create({
-        model: "gpt-4.1-2025-04-14",
+        model: MODEL,
         instructions: basePrompt,
         input,
-        temperature: 0.9,
-        top_p: 0.8,
+        reasoning: { effort: "low" },
         store: false,
         text: {
           format: zodTextFormat(responseMultiSchemaWithScratchPad, "response"),
@@ -180,7 +179,7 @@ Have fun and make some great zingers!`;
      */
     async generateOneMeaning(acronym) {
       const response = await client.responses.create({
-        model: "gpt-4.1-2025-04-14",
+        model: MODEL,
         instructions: basePrompt,
         input: `Please come up with a random possible meaning for the following letters: ${acronym}.
 
@@ -188,8 +187,7 @@ Take your time in coming up with truly great, funny acronym. Feel free to brains
 Also think about different industries/intrests groups words like: sales, tech, gamers, parents, sports, shopping, and more. Anything to make a funny, relateable acronym.
 As you draft self-critique your choices and iterate. You don't have to use your first draft choices in your final results.
 Have fun and make some great zingers!`,
-        temperature: 0.9,
-        top_p: 0.8,
+        reasoning: { effort: "low" },
         store: false,
         text: { format: zodTextFormat(responseSingleSchema, "response") },
       });
