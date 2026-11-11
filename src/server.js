@@ -231,7 +231,8 @@ exports.createServer = async (controller) => {
           res.end(controller.randomStatus(acronym));
           const responseUrl = formData.get("response_url");
           if (!responseUrl) {
-            res.end("No response URL found");
+            // Response already sent above; just bail.
+            console.error("No response URL found");
             break;
           }
           const d = new Date();

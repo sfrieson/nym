@@ -9,4 +9,4 @@ function expect(value, message) {
   return value;
 }
 
-export { expect };
+module.exports = { expect };

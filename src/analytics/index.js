@@ -1,24 +1,33 @@
-const { PostHog } = require("posthog-node");
-
 const { expect } = require("../util.js");
 
 /**
- * @type {PostHog}
+ * @type {import("posthog-node").PostHog | undefined}
  */
 let client;
 
 function init() {
   const disabled = process.env.POSTHOG_DISABLED === "true";
-  client = new PostHog(
-    expect(process.env.POSTHOG_API_KEY, "POSTHOG_API_KEY is not set"),
-    {
-      host: "https://us.i.posthog.com",
-      disabled,
-    }
+  const apiKey = expect(
+    process.env.POSTHOG_API_KEY,
+    "POSTHOG_API_KEY is not set"
   );
 
+  // Lazily load posthog-node so it stays off the cold-start path.
+  const getClient = () => {
+    if (!client) {
+      const { PostHog } = require("posthog-node");
+      client = new PostHog(apiKey, {
+        host: "https://us.i.posthog.com",
+        disabled,
+      });
+    }
+    return client;
+  };
+
   return {
-    shutdown: () => client.shutdown(),
+    shutdown: async () => {
+      if (client) await client.shutdown();
+    },
     /**
      *
      * @param {Record<string, any>} properties
@@ -44,7 +53,7 @@ function init() {
             console.log("🐽", event, { distinctId }, properties);
           }
 
-          client.capture({
+          getClient().capture({
             event,
             distinctId,
             properties: { ...ctx, ...properties },

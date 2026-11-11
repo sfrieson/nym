@@ -23,7 +23,9 @@ server.createServer(controllerWithStatus).then((server) => {
       `Server is running on port ${port} in ${performance.now() - start}ms`
     );
 
-    controller.healthcheck().catch(console.error);
+    // Defer warm-up: requiring openai blocks the event loop, and on a cold
+    // start the first (often Slack) request is already queued at the proxy.
+    setTimeout(() => controller.healthcheck().catch(console.error), 2000).unref();
   });
   async function shutdown() {
     console.log("Shutting down...");
