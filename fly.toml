@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for nym-blue-brook-5991 on 2025-06-07T15:40:36-04:00
+# fly.toml app configuration file generated for nym-blue-brook-5991 (now targets nym) on 2025-06-07T15:40:36-04:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'nym-blue-brook-5991'
+app = 'nym'
 primary_region = 'iad'
 
 [http_service]
